@@ -1,0 +1,75 @@
+body{
+  font-family: "Trebuchet MS", sans-serif;
+  background-color: #1a001f;
+  color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+header{
+  background-color: #7209b7;
+  padding: 1rem;
+  text-align: center;
+}
+
+header h1{
+  margin: 0;
+  color: #ffd6ff;
+}
+
+nav{
+  margin-top: 1rem;
+}
+
+nav a{
+  color: #ffd6ff;
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+nav a:hover{
+  background-color: #b5179e;
+}
+
+main{
+  padding: 2rem;
+}
+
+footer{
+  background-color: #3a0ca3;
+  text-align: center;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.chart-container{
+  width: min(90vw, 420px);
+  aspect-ratio: 1 / 1; /* mantém o formato circular */
+  margin: 2rem auto;
+  background: radial-gradient(circle at center, #2b0058 0%, #1a001f 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 20px rgba(157, 78, 221, 0.3),
+    inset 0 0 25px rgba(157, 78, 221, 0.15);
+}
+
+.chart-box{
+  background: rgba(45, 0, 65, 0.4); /*leve transparência roxa*/
+  border: 2px solid rgba(157, 78, 221, 0.5);
+  border-radius: 20px;
+  padding: 20px 30px;
+  width: min(95vw, 480px);
+  margin: 2rem auto;
+  box-shadow:
+    0 0 15px rgba(157, 78, 221, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
