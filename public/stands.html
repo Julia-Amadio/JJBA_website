@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Enciclopédia JoJo</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Importa Chart.js direto da CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Estilo adicional só para esta página -->
+    <style>
+        h2{
+            text-align: center;
+            color: #ffd6ff;
+        }
+
+        select{
+            display: block;
+            margin: 1rem auto;
+            padding: 6px 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+            background-color: #3c1361;
+            color: #fff;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Enciclopédia JJBA - Stands</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="characters.html">Personagens</a>
+            <!-- <a href="battles.html">Batalhas</a> -->
+            <!-- <a href="parts.html">Partes</a> -->
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Selecione um Stand</h2>
+            <select id="stand-select">
+            </select>
+
+            <div class="chart-box">
+                <div class="chart-container">
+                    <canvas id="standChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let meuGrafico; // Variável para guardar a instância do gráfico
+        let todosOsStands = []; // Array para guardar os dados do banco
+
+        //Função que converte as letras (A, B, C...) em números para o gráfico
+        //Já tinha uma lógica parecida no 'callback'
+        function converterStatusParaNumero(status) {
+            //Adicionado 'Nulo': 0 para lidar com os dados do banco
+            const mapa = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1, 'N/A': 0, 'Infinito': 5, '?': 0, 'Nulo': 0 };
+            return mapa[status] || 0;
+        }
+
+        //Função de carregar o gráfico, levemente modificada
+        function carregarGrafico(dadosDoStand) {
+            const ctx = document.getElementById('standChart').getContext('2d');
+
+            //Mapeia os dados do stand para o formato do gráfico
+            const dadosNumericos = [
+                converterStatusParaNumero(dadosDoStand.poder_destrutivo),
+                converterStatusParaNumero(dadosDoStand.velocidade),
+                converterStatusParaNumero(dadosDoStand.alcance),
+                converterStatusParaNumero(dadosDoStand.durabilidade),
+                converterStatusParaNumero(dadosDoStand.precisao),
+                converterStatusParaNumero(dadosDoStand.potencial)
+            ];
+
+            //Destrói o gráfico anterior, se existir (para não sobrepor)
+            if (meuGrafico) {
+                meuGrafico.destroy();
+            }
+
+            //Cria o novo gráfico
+            meuGrafico = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Poder Destrutivo', 'Velocidade', 'Alcance', 'Durabilidade', 'Precisão', 'Potencial'],
+                    datasets: [{
+                        label: dadosDoStand.nome,
+                        data: dadosNumericos,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgb(255, 99, 132)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    layout: {
+                        padding: {
+                            top: 20,
+                            bottom: 20,
+                            left: 10   //Aumenta margem direita pra centralizar o grafo. Fica feio sem. Não tente mudar!!
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5, //Gráfico vai de 0 a 5
+                            grid: { color: 'rgba(255, 255, 255, 0.2)', circular: true },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.15)', lineWidth: 1 },
+                            pointLabels: { color: '#ffffff', font: { size: 12, weight: 'bold' }, padding: 6 },
+                            ticks: {
+                                stepSize: 1,
+                                color: '#ffffff',
+                                backdropColor: 'transparent',
+                                font: { size: 12, weight: 'bold' },
+                                tickLength: 0,
+                                //Callback para mostrar letras (E, D, C, B, A)
+                                callback: function(value) {
+                                    const letters = ['N/A', 'E', 'D', 'C', 'B', 'A'];
+                                    return letters[value] || '';
+                                }
+                            }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        //NOVA FUNÇÃO: Atualiza o gráfico quando o <select> mudar
+        function atualizarGraficoPeloSelect() {
+            const select = document.getElementById('stand-select');
+            const nomeDoStand = select.value;
+
+            //Encontra o objeto do stand selecionado no array 'todosOsStands'
+            const standSelecionado = todosOsStands.find(stand => stand.nome === nomeDoStand);
+
+            if (standSelecionado) {
+                carregarGrafico(standSelecionado);
+            }
+        }
+
+        //NOVA FUNÇÃO PRINCIPAL: Busca dados da API e popula a página
+        async function iniciarPagina() {
+            try {
+                //Busca os dados da API que criamos no server.js
+                const response = await fetch('/api/stands');
+                todosOsStands = await response.json(); // Guarda os dados globalmente
+
+                const select = document.getElementById('stand-select');
+
+                //Popula o <select> com os dados do banco
+                todosOsStands.forEach(stand => {
+                    const option = document.createElement('option');
+                    option.value = stand.nome;
+                    option.textContent = stand.nome;
+                    select.appendChild(option);
+                });
+
+                //Adiciona o 'escutador' de eventos para atualizar o gráfico
+                select.addEventListener('change', atualizarGraficoPeloSelect);
+
+                //Carrega o gráfico do primeiro stand da lista
+                if (todosOsStands.length > 0) {
+                    carregarGrafico(todosOsStands[0]);
+                }
+
+            } catch (error) {
+                console.error('Falha ao carregar stands:', error);
+                alert('Não foi possível carregar os dados dos Stands.');
+            }
+        }
+
+        //Inicia tudo quando a página carregar
+        window.onload = iniciarPagina;
+    </script>
+</body>
+</html>
