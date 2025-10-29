@@ -32,7 +32,7 @@ Este projeto foi desenvolvido para a disciplina de Bancos de Dados II, com o obj
     ```
 
 2.  **Instale as Dependências do Back-End**
-<br>No terminal, navegue até a raiz do repositório clonado e execute:
+    <br>No terminal, navegue até a raiz do repositório clonado e execute:
     ```bash
     npm install
     ```

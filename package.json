@@ -1,0 +1,26 @@
+{
+  "name": "jjba_website",
+  "version": "1.0.0",
+  "description": "Projeto de aplicação web dinâmica com front-end (HTML, CSS, JS) e back-end (Node.js, Express) conectado a um banco de dados PostgreSQL (Neon).",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Julia-Amadio/JJBA_website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Julia-Amadio/JJBA_website/issues"
+  },
+  "homepage": "https://github.com/Julia-Amadio/JJBA_website#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}
