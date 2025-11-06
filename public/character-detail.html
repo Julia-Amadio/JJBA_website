@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Enciclopédia JoJo - Detalhes</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /*Estilos para a página de detalhes*/
+        #detalhes-container {
+            background-color: #2b0b3f;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+        #detalhes-container h2 {
+            color: #ffd6ff;
+            text-align: center;
+            margin-top: 0;
+        }
+        #detalhes-container p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-bottom: 1px solid #3c1361;
+            padding-bottom: 10px;
+        }
+        #detalhes-container p strong {
+            color: #f7a0ff; /*Cor roxa mais clara para o label*/
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Enciclopédia JJBA - Detalhes do Personagem</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="stands.html">Stands</a>
+            <a href="characters.html">Personagens</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="detalhes-container">
+            <p>Carregando...</p>
+        </div>
+    </main>
+
+    <script>
+        //Função para buscar e exibir os detalhes do personagem
+        async function carregarDetalhes() {
+            const container = document.getElementById('detalhes-container');
+            try {
+                //1. Pega os parâmetros da URL (ex: ?nome=Dio%20Brando)
+                const urlParams = new URLSearchParams(window.location.search);
+                const nomePersonagem = urlParams.get('nome'); // 'Dio Brando'
+
+                if (!nomePersonagem) {
+                    container.innerHTML = '<h2>Erro</h2><p>Nenhum personagem selecionado.</p>';
+                    return;
+                }
+
+                //2. Chama a nossa API de detalhe
+                const response = await fetch('/api/personagem/' + encodeURIComponent(nomePersonagem));
+
+                if (!response.ok) {
+                    throw new Error('Personagem não encontrado');
+                }
+
+                const personagem = await response.json(); //Pega o objeto {nome: ..., genero: ...}
+
+                //3. Limpa o "Carregando..." e constrói o HTML com os dados
+                container.innerHTML = ''; // Limpa
+
+                //Título
+                const titulo = document.createElement('h2');
+                titulo.textContent = personagem.nome;
+                container.appendChild(titulo);
+
+                //Lista de Detalhes (usando os campos da sua tabela 'Personagens')
+                container.appendChild(criarDetalhe('Gênero:', personagem.genero));
+                container.appendChild(criarDetalhe('Nacionalidade:', personagem.nacionalidade));
+                container.appendChild(criarDetalhe('Ano de Nascimento:', personagem.ano_nascimento));
+                container.appendChild(criarDetalhe('Primeira Aparição:', personagem.primeira_aparicao));
+                container.appendChild(criarDetalhe('Status:', personagem.vivo ? 'Vivo' : 'Morto'));
+
+            } catch (error) {
+                console.error('Falha ao carregar detalhes:', error);
+                container.innerHTML = '<h2>Erro</h2><p>Não foi possível carregar os detalhes do personagem.</p>';
+            }
+        }
+
+        //Função auxiliar para criar as linhas de <p>
+        function criarDetalhe(label, valor) {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${label}</strong> ${valor || 'N/A'}`;
+            return p;
+        }
+
+        //Inicia tudo quando a página carregar
+        window.onload = carregarDetalhes;
+    </script>
+</body>
+</html>

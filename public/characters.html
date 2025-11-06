@@ -18,16 +18,59 @@
 
     <main>
         <section>
-            <h2>Lista de personagens</h2>
-            <h3>Esta página tem dados FALSOS temporários.</h3>
-            <div id="lista-personagens">
-                <p>Jonathan Joestar</p>
-                <p>Joseph Joestar</p>
-                <p>Jotaro Kujo</p>
-                <p>Josuke Higashikata</p>
-            </div>
+            <h2 style="text-align: center;">Lista de personagens</h2>
+            <div id="lista-personagens"></div>
         </section>
     </main>
+
+    <script>
+        async function carregarListaPersonagens() {
+            const divLista = document.getElementById('lista-personagens');
+            try {
+                //1. Busca a lista de nomes da nova API
+                const response = await fetch('/api/personagens');
+                const personagens = await response.json(); //Ex: [{nome: 'Dio Brando'}, {nome: 'Giorno Giovanna'}, ...]
+
+                let letraAtual = ''; //Para controlar o agrupamento A, B, C...
+
+                //2. Itera sobre cada personagem retornado
+                personagens.forEach(personagem => {
+                    const primeiraLetra = personagem.nome[0].toUpperCase();
+
+                    //3. Se é uma letra nova, cria o cabeçalho
+                    if (primeiraLetra !== letraAtual) {
+                        letraAtual = primeiraLetra;
+
+                        //Adiciona um separador (exceto antes da letra 'A')
+                        if (divLista.children.length > 0) {
+                            divLista.appendChild(document.createElement('hr'));
+                        }
+
+                        const headerLetra = document.createElement('h2');
+                        headerLetra.textContent = letraAtual;
+                        divLista.appendChild(headerLetra);
+                    }
+
+                    //4. Cria o link para a página de detalhe
+                    const link = document.createElement('a');
+                    link.textContent = personagem.nome;
+                    link.className = 'link-personagem';
+
+                    //Passa o nome do personagem como um "parâmetro de URL"
+                    link.href = 'character-detail.html?nome=' + encodeURIComponent(personagem.nome);
+
+                    divLista.appendChild(link);
+                });
+
+            } catch (error) {
+                console.error('Falha ao carregar personagens:', error);
+                divLista.textContent = 'Erro ao carregar lista de personagens.';
+            }
+        }
+
+        //Inicia a função quando a página carregar
+        window.onload = carregarListaPersonagens;
+    </script>
 
     <footer>
         <p>Projeto desenvolvido pelos alunos João Bastasini, Julia Amadio e Thiago Uliame para a disciplina de Bancos de Dados II.</p>

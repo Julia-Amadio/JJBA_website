@@ -35,6 +35,7 @@ nav a:hover{
 
 main{
   padding: 2rem;
+  padding-bottom: 6rem; /*Adiciona espaço no final para o rodapé*/
 }
 
 footer{
@@ -48,7 +49,7 @@ footer{
 
 .chart-container{
   width: min(90vw, 420px);
-  aspect-ratio: 1 / 1; /* mantém o formato circular */
+  aspect-ratio: 1 / 1; /*mantém o formato circular*/
   margin: 2rem auto;
   background: radial-gradient(circle at center, #2b0058 0%, #1a001f 100%);
   border-radius: 50%;
@@ -72,4 +73,42 @@ footer{
     0 0 15px rgba(157, 78, 221, 0.3),
     inset 0 0 20px rgba(255, 255, 255, 0.05);
   text-align: center;
+}
+
+#lista-personagens {
+    max-width: 700px;  /*Deixa o container "pequeno"*/
+    margin: 0 auto;    /*Centraliza o container na tela*/
+
+    /*Estilos bônus (para parecer com a pág. de detalhes)*/
+    background-color: #2b0b3f;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+/*Estilo para a linha separadora <hr>*/
+#lista-personagens hr {
+    border: 0;
+    border-top: 1px solid #46096e;
+    margin: 1.5rem 0;
+}
+
+#lista-personagens h2 {
+    color: #ffd6ff; /*Cor da letra A, B, C...*/
+    margin-top: 1.5rem;
+    border-bottom: 2px solid #d0bcdd;
+    padding-bottom: 5px;
+}
+
+#lista-personagens a.link-personagem {
+    display: block; /*Faz cada link ocupar uma linha*/
+    color: #f8f9fa;
+    text-decoration: none;
+    padding: 8px 5px;
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+#lista-personagens a.link-personagem:hover {
+    background-color: #3c1361;
+    color: #fff;
 }
