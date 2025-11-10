@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Enciclopédia JoJo - Detalhes do Stand</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /*Estilos da página de detalhes (como em character-detail.html)*/
+        #detalhes-stand {
+            background-color: #2b0b3f;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 700px; /*Um pouco maior para o gráfico*/
+            margin: 1rem auto;
+        }
+        #detalhes-stand h2 {
+            color: #ffd6ff;
+            text-align: center;
+            margin-top: 0;
+        }
+        #detalhes-stand p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-bottom: 1px solid #3c1361;
+            padding-bottom: 10px;
+        }
+        #detalhes-stand p strong {
+            color: #f7a0ff; /*Cor roxa mais clara para o label*/
+        }
+
+        /*Seção de habilidades*/
+        .habilidade {
+            border-left: 3px solid #f7a0ff; /*Uma linha roxa à esquerda*/
+            margin-top: 1rem;
+            padding-left: 10px;
+
+            /*Sobrescreve a linha de baixo do <p> normal*/
+            border-bottom: none;
+            padding-bottom: 5px; 
+        }
+        .habilidade:last-of-type {
+            /*Adiciona a linha de baixo apenas no último item*/
+            border-bottom: 1px solid #3c1361;
+            padding-bottom: 10px;
+        }
+        .habilidade strong {
+            color: #ffd6ff; /*Deixa o nome da habilidade mais claro*/
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Enciclopédia JJBA - Detalhes do Stand</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="stands.html">Stands</a>
+            <a href="characters.html">Personagens</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="detalhes-stand">
+            <p>Carregando...</p>
+        </div>
+    </main>
+
+    <script>
+        let meuGrafico; //Variável para guardar a instância do gráfico
+
+        //FUNÇÕES DO GRÁFICO
+
+        function converterStatusParaNumero(status) {
+            const mapa = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1, 'N/A': 0, 'Infinito': 5, '?': 0, 'Nulo': 0 };
+            return mapa[status] || 0;
+        }
+
+        function carregarGrafico(dadosDoStand, canvas) {
+            const ctx = canvas.getContext('2d');
+            const dadosNumericos = [
+                converterStatusParaNumero(dadosDoStand.poder_destrutivo),
+                converterStatusParaNumero(dadosDoStand.velocidade),
+                converterStatusParaNumero(dadosDoStand.alcance),
+                converterStatusParaNumero(dadosDoStand.durabilidade),
+                converterStatusParaNumero(dadosDoStand.precisao),
+                converterStatusParaNumero(dadosDoStand.potencial)
+            ];
+
+            if (meuGrafico) {
+                meuGrafico.destroy();
+            }
+
+            meuGrafico = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Poder Destrutivo', 'Velocidade', 'Alcance', 'Durabilidade', 'Precisão', 'Potencial'],
+                    datasets: [{
+                        label: dadosDoStand.nome,
+                        data: dadosNumericos,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgb(255, 99, 132)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0, max: 5,
+                            grid: { color: 'rgba(255, 255, 255, 0.2)', circular: true },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.15)', lineWidth: 1 },
+                            pointLabels: { color: '#ffffff', font: { size: 12, weight: 'bold' }, padding: 6 },
+                            ticks: {
+                                stepSize: 1,
+                                color: '#ffffff',
+                                backdropColor: 'transparent',
+                                font: { size: 12, weight: 'bold' },
+                                tickLength: 0,
+                                callback: function(value) {
+                                    const letters = ['N/A', 'E', 'D', 'C', 'B', 'A'];
+                                    return letters[value] || '';
+                                }
+                            }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        //FUNÇÃO DE CARREGAR OS DETALHES (dados que não existiam antes em stands.html)
+
+        async function carregarDetalhesStand() {
+            const container = document.getElementById('detalhes-stand');
+            try {
+                //Pega o nome da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const nomeStand = urlParams.get('nome');
+
+                if (!nomeStand) {
+                    container.innerHTML = '<h2>Erro</h2><p>Nenhum stand selecionado.</p>';
+                    return;
+                }
+
+                //Chama a nossa NOVA API de detalhe do stand
+                const response = await fetch('/api/stand/' + encodeURIComponent(nomeStand));
+
+                if (!response.ok) {
+                    throw new Error('Stand não encontrado');
+                }
+
+                const stand = await response.json();
+
+                //Limpa o "Carregando..." e constrói o HTML
+                container.innerHTML = ''; //Limpa
+
+                //Título
+                const titulo = document.createElement('h2');
+                titulo.textContent = stand.nome;
+                container.appendChild(titulo);
+
+                //Exibindo as informações que faltavam
+                //BLOCO para o Usuário
+                if (stand.personagem_nome) {
+                    //Havendo um usuário, cria um parágrafo <p> com um link <a>
+                    const pUsuario = document.createElement('p');
+                    pUsuario.innerHTML = `<strong>Usuário:</strong> <a href="character-detail.html?nome=${encodeURIComponent(stand.personagem_nome)}">${stand.personagem_nome}</a>`;
+                    container.appendChild(pUsuario);
+                } else {
+                    //Se não, mostra 'N/A'
+                    container.appendChild(criarDetalhe('Usuário:', 'N/A'));
+                }
+                container.appendChild(criarDetalhe('Referência Musical:', stand.referencia));
+                container.appendChild(criarDetalhe('Categoria:', stand.categoria));
+
+                //BLOCO para HABILIDADES
+                if (stand.habilidades && stand.habilidades.length > 0) {
+                    //Cria um título para a seção
+                    const h3Habilidades = document.createElement('h3');
+                    h3Habilidades.textContent = 'Habilidade(s)';
+                    h3Habilidades.style.color = '#f7a0ff'; //Estilo do detalhes-stand p strong
+                    h3Habilidades.style.marginTop = '2rem'; //Espaçamento
+                    h3Habilidades.style.borderBottom = '1px solid #3c1361'; //Linha
+                    h3Habilidades.style.paddingBottom = '5px';
+                    container.appendChild(h3Habilidades);
+
+                    //Faz um loop por todas as habilidades
+                    stand.habilidades.forEach(habilidade => {
+                        const pHabilidade = document.createElement('p');
+                        pHabilidade.className = 'habilidade'; //Aplica o CSS criado no começo
+
+                        //Cria o texto com negrito no nome
+                        pHabilidade.innerHTML = `<strong>${habilidade.nome}:</strong> ${habilidade.descricao}`;
+                        container.appendChild(pHabilidade);
+                    });
+                }
+                //FIM DO BLOCO
+
+                //Cria o container e o canvas para o gráfico
+                const chartBox = document.createElement('div');
+                chartBox.className = 'chart-box'; //Usando a classe do style.css
+
+                const chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+
+                const canvas = document.createElement('canvas');
+                canvas.id = 'standChart'; //O ID que o gráfico espera
+
+                chartContainer.appendChild(canvas);
+                chartBox.appendChild(chartContainer);
+                container.appendChild(chartBox); //Adiciona o gráfico ao container de detalhes
+
+                //Chama a função para desenhar o gráfico
+                carregarGrafico(stand, canvas);
+
+            } catch (error) {
+                console.error('Falha ao carregar detalhes do Stand:', error);
+                container.innerHTML = '<h2>Erro</h2><p>Não foi possível carregar os detalhes do stand.</p>';
+            }
+        }
+
+        //Função auxiliar para criar as linhas de <p>
+        function criarDetalhe(label, valor) {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${label}</strong> ${valor || 'N/A'}`;
+            return p;
+        }
+
+        //Inicia tudo quando a página carregar
+        window.onload = carregarDetalhesStand;
+    </script>
+
+    <footer>
+        <p>Projeto desenvolvido pelos alunos João Bastasini, Julia Amadio e Thiago Uliame para a disciplina de Bancos de Dados II.</p>
+    </footer>
+</body>
+</html>
