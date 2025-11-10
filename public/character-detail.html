@@ -52,7 +52,7 @@
             try {
                 //1. Pega os parâmetros da URL (ex: ?nome=Dio%20Brando)
                 const urlParams = new URLSearchParams(window.location.search);
-                const nomePersonagem = urlParams.get('nome'); // 'Dio Brando'
+                const nomePersonagem = urlParams.get('nome'); //'Dio Brando'
 
                 if (!nomePersonagem) {
                     container.innerHTML = '<h2>Erro</h2><p>Nenhum personagem selecionado.</p>';
@@ -69,19 +69,46 @@
                 const personagem = await response.json(); //Pega o objeto {nome: ..., genero: ...}
 
                 //3. Limpa o "Carregando..." e constrói o HTML com os dados
-                container.innerHTML = ''; // Limpa
+                container.innerHTML = ''; //Limpa
 
                 //Título
                 const titulo = document.createElement('h2');
                 titulo.textContent = personagem.nome;
                 container.appendChild(titulo);
 
-                //Lista de Detalhes (usando os campos da sua tabela 'Personagens')
+                //Lista de Detalhes (usando os campos da tabela 'Personagens')
                 container.appendChild(criarDetalhe('Gênero:', personagem.genero));
                 container.appendChild(criarDetalhe('Nacionalidade:', personagem.nacionalidade));
                 container.appendChild(criarDetalhe('Ano de Nascimento:', personagem.ano_nascimento));
                 container.appendChild(criarDetalhe('Primeira Aparição:', personagem.primeira_aparicao));
                 container.appendChild(criarDetalhe('Status:', personagem.vivo ? 'Vivo' : 'Morto'));
+                //NOVO BLOCO para Stands
+                //O 'personagem.stands' agora vem da nossa API atualizada
+                if (personagem.stands && personagem.stands.length > 0) {
+                    //Se houver stands, cria um parágrafo para eles
+                    const pStands = document.createElement('p');
+                    pStands.innerHTML = `<strong>Stand(s):</strong> `;
+
+                    //Faz um loop por todos os stands (útil se um dia um personagem tiver mais de 1)
+                    personagem.stands.forEach((stand, index) => {
+                        //Cria o link <a>
+                        const linkStand = document.createElement('a');
+                        linkStand.href = `stand-detail.html?nome=${encodeURIComponent(stand.nome)}`;
+                        linkStand.textContent = stand.nome;
+
+                        pStands.appendChild(linkStand); //Adiciona o link ao parágrafo
+
+                        //Adiciona uma vírgula se houver mais stands na lista
+                        if (index < personagem.stands.length - 1) {
+                            pStands.append(', ');
+                        }
+                    });
+
+                    container.appendChild(pStands);
+                } else {
+                    //Se o personagem não tem stand (ex: Lisa Lisa), mostra "Nenhum"
+                    container.appendChild(criarDetalhe('Stand(s):', 'Nenhum'));
+                }
 
             } catch (error) {
                 console.error('Falha ao carregar detalhes:', error);
