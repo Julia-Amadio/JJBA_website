@@ -26,11 +26,11 @@ const pool = new Pool({
 //Isso faz a pasta 'public' ser a raiz do site
 app.use(express.static('public'));
 
-//Criar a Rota da API (Onde o front-end buscará os dados)
+//ROTA DA API (STANDS): Buscar TODOS os Stands (em ordem alfabética)
 app.get('/api/stands', async (req, res) => {
   try {
     //Consulta SQL para buscar todos os stands
-    const query = 'SELECT * FROM Stands';
+    const query = 'SELECT * FROM Stands ORDER BY nome ASC';
     const result = await pool.query(query);
 
     //Envia os dados encontrados como JSON
@@ -41,7 +41,7 @@ app.get('/api/stands', async (req, res) => {
   }
 });
 
-//ROTA DA API (PÁGINA 1 - PERSONAGENS): Buscar TODOS os personagens (em ordem alfabética)
+//ROTA DA API (PERSONAGENS): Buscar TODOS os personagens (em ordem alfabética)
 app.get('/api/personagens', async (req, res) => {
   try {
     //Busca todos os nomes da tabela Personagens, ordenados pelo nome
