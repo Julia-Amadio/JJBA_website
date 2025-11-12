@@ -1,19 +1,14 @@
-//Importar as bibliotecas (Express e o driver 'pg' do Postgres)
+//Importar as bibliotecas (Express, dotenv e o driver 'pg' do Postgres)
 const express = require('express');
 const { Pool } = require('pg');
+require('dotenv').config();
 
 //Inicializar o Express
 const app = express();
 const port = 3000; //Porta onde o servidor vai rodar
 
-//Configurar a Conexão com o Banco
-//ATENÇÃO: Pegar string de conexão no site do Neon 
-//e colar ela aqui quando pronta.
-const connectionString = "string_de_conexao_neon_esta_no_zipzop"; 
-//A STRING DE CONEXÃO DO NEON FOI PASSADA NO ZAP
-//A STRING DE CONEXÃO NÃO DEVE IR PRO GITHUB DE MANEIRA ALGUMA
-//APENAS ESTE CÓDIGO DEVE.
-//VOU DESCOBRIR OUTRA HORA COMO FAÇO PRA ELE NÃO APARECER NO RENDER.
+//Config conexão com o banco
+const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: connectionString,
