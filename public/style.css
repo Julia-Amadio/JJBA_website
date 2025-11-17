@@ -17,6 +17,12 @@ header h1{
   color: #ffd6ff;
 }
 
+.img_center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 nav{
   margin-top: 1rem;
 }
@@ -31,6 +37,14 @@ nav a{
 
 nav a:hover{
   background-color: #b5179e;
+}
+
+nav b{
+  color: #4e344e;
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
 }
 
 main{
