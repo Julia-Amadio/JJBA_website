@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Enciclopédia JoJo - Detalhes</title>
     <link rel="stylesheet" href="style.css">
+    <script src="global.js" defer></script>
     <style>
         /*Estilos para a página de detalhes*/
         #detalhes-container {
@@ -80,7 +81,7 @@
                 container.appendChild(criarDetalhe('Gênero:', personagem.genero));
                 container.appendChild(criarDetalhe('Nacionalidade:', personagem.nacionalidade));
                 container.appendChild(criarDetalhe('Ano de Nascimento:', personagem.ano_nascimento));
-                container.appendChild(criarDetalhe('Primeira Aparição:', personagem.primeira_aparicao));
+                container.appendChild(criarDetalhe('Primeira Aparição:', formatarPrimeiraAparicao(personagem.primeira_aparicao)));
                 container.appendChild(criarDetalhe('Status:', personagem.vivo ? 'Vivo' : 'Morto'));
                 //NOVO BLOCO para Stands
                 //O 'personagem.stands' agora vem da nossa API atualizada
@@ -110,10 +111,105 @@
                     container.appendChild(criarDetalhe('Stand(s):', 'Nenhum'));
                 }
 
+                if (personagem.episodios && personagem.episodios.length > 0) {
+                    
+                    // 1. Cria o título da seção
+                    const h3Episodios = document.createElement('h3');
+                    h3Episodios.textContent = 'Aparições em Episódios';
+                    h3Episodios.className = 'section-title'; // Classe para o CSS
+                    container.appendChild(h3Episodios);
+
+                    // 2. Cria a lista (<ul>)
+                    const listaEpisodios = document.createElement('ul');
+                    listaEpisodios.className = 'details-list'; // Classe para o CSS
+                    
+                    // 3. Cria um item (<li>) para cada episódio
+                    personagem.episodios.forEach(ep => {
+                        const li = document.createElement('li');
+                        // O 'ep.numero' e 'ep.nome' vêm do JOIN com a tabela Episodios
+                        li.innerHTML = `<strong>Ep. ${ep.numero}:</strong> ${ep.nome}`; 
+                        listaEpisodios.appendChild(li);
+                    });
+                    
+                    container.appendChild(listaEpisodios);
+                }
+
+                // ==========================================================
+                // NOVO BLOCO - BATALHAS (Baseado na tabela Batalha)
+                //  Alteração Lhama 
+                // ==========================================================
+                if (personagem.batalhas && personagem.batalhas.length > 0) {
+                    
+                    // 1. Cria o título da seção
+                    const h3Batalhas = document.createElement('h3');
+                    h3Batalhas.textContent = 'Confrontos Registrados';
+                    h3Batalhas.className = 'section-title';
+                    container.appendChild(h3Batalhas);
+
+                    // 2. Cria a lista (<ul>)
+                    const listaBatalhas = document.createElement('ul');
+                    listaBatalhas.className = 'details-list';
+                    
+                    // 3. Cria um item (<li>) para cada batalha
+                    personagem.batalhas.forEach(luta => {
+                        const li = document.createElement('li');
+                        // 'luta.vencedor || "N/D"' significa: use o vencedor, 
+                        // mas se for nulo (null), escreva "N/D"
+                        li.innerHTML = `<strong>${luta.personagem_a} vs. ${luta.personagem_b}</strong><br>
+                                        <small>Vencedor: ${luta.vencedor || 'N/D'}</small>`;
+                        listaBatalhas.appendChild(li);
+                    });
+                    
+                    container.appendChild(listaBatalhas);
+                }
+                
+                // ==========================================================
+                // FIM DO NOVO BLOCO
+                // ==========================================================
+
             } catch (error) {
                 console.error('Falha ao carregar detalhes:', error);
                 container.innerHTML = '<h2>Erro</h2><p>Não foi possível carregar os detalhes do personagem.</p>';
             }
+        }
+
+        // [NOVA FUNÇÃO]
+        // Mapeia os códigos das Partes para os nomes completos
+        // (Baseado no seu PopulateJoJoCorrected.sql)
+        const partMap = {
+            'PB': 'Phantom Blood',
+            'BT': 'Battle Tendency',
+            'SC': 'Stardust Crusaders',
+            'DU': 'Diamond is Unbreakable', 
+            'GW': 'Golden Wind',           
+            'SO': 'Stone Ocean'            
+        };
+
+        // [NOVA FUNÇÃO]
+        // Formata o código 'PB9' para 'Phantom Blood 9'
+        function formatarPrimeiraAparicao(codigo) {
+            if (!codigo) {
+                return 'N/A'; // Retorna N/A se o campo for nulo
+            }
+
+            // Esta expressão regular (RegEx) separa letras de números.
+            // Ex: "SC1" -> ["SC1", "SC", "1"]
+            const match = codigo.match(/^([A-Z]+)(\d+)$/);
+
+            if (match) {
+                const partCode = match[1]; // "SC"
+                const episodeNumber = match[2]; // "1"
+                
+                // Procura o nome completo no mapa. Se não achar, usa o próprio código (ex: "SC")
+                const partName = partMap[partCode] || partCode;
+                
+                // Retorna o formato final
+                return `${partName} ${episodeNumber}`; // "Stardust Crusaders 1"
+            }
+
+            // Se não der "match" (ex: for um formato que não esperamos), 
+            // apenas retorna o código original que veio do banco.
+            return codigo;
         }
 
         //Função auxiliar para criar as linhas de <p>

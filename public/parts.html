@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Enciclopédia JoJo - Episódios</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="global.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Enciclopédia JJBA - Episódios por Parte</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="characters.html">Personagens</a>
+            <a href="stands.html">Stands</a>
+            <!-- Você pode adicionar este link nas outras páginas também -->
+            <!-- <a href="parts.html">Episódios</a> -->
+        </nav>
+    </header>
+
+    <main>
+        <!-- O container principal onde as partes e episódios serão inseridos -->
+        <div id="lista-partes-container">
+            <p style="text-align: center;">Carregando episódios...</p>
+        </div>
+    </main>
+
+    <script>
+        async function carregarPartesEepisodios() {
+            const container = document.getElementById('lista-partes-container');
+            container.innerHTML = ''; // Limpa o "Carregando..."
+
+            try {
+                // 1. Chama a nova rota da API que busca tudo agrupado
+                const response = await fetch('/api/partes-com-episodios');
+                if (!response.ok) {
+                    throw new Error('Falha ao buscar dados');
+                }
+                
+                const partes = await response.json(); // Ex: [{numero: 1, nome: 'Phantom Blood', episodios: [...]}, ...]
+
+                // 2. Itera sobre cada PARTE (Temporada)
+                partes.forEach(parte => {
+                    
+                    // Cria o título da Parte (ex: "Parte 1: Phantom Blood")
+                    const h2Parte = document.createElement('h2');
+                    h2Parte.className = 'parte-titulo'; // Classe para o CSS
+                    h2Parte.textContent = `Parte ${parte.numero}: ${parte.nome}`;
+                    container.appendChild(h2Parte);
+
+                    // Cria um container para os episódios desta parte
+                    const divListaEpisodios = document.createElement('div');
+                    divListaEpisodios.className = 'episodio-lista'; // Classe para o CSS
+                    
+                    // 3. Itera sobre cada EPISÓDIO dentro da parte
+                    parte.episodios.forEach(ep => {
+                        // Cria o "card" para o episódio
+                        const divEpisodio = document.createElement('div');
+                        divEpisodio.className = 'episodio-item'; // Classe para o CSS
+
+                        // Cria o título do episódio
+                        const h3EpTitulo = document.createElement('h3');
+                        h3EpTitulo.textContent = `Ep. ${ep.numero}: ${ep.nome}`;
+                        
+                        // Cria a descrição do episódio
+                        const pEpDescricao = document.createElement('p');
+                        pEpDescricao.textContent = ep.descricao || 'Descrição não disponível.';
+
+                        // Adiciona o título e a descrição ao "card"
+                        divEpisodio.appendChild(h3EpTitulo);
+                        divEpisodio.appendChild(pEpDescricao);
+
+                        // Adiciona o "card" do episódio à lista da parte
+                        divListaEpisodios.appendChild(divEpisodio);
+                    });
+
+                    // Adiciona a lista de episódios ao container principal
+                    container.appendChild(divListaEpisodios);
+                });
+
+            } catch (error) {
+                console.error('Falha ao carregar partes e episódios:', error);
+                container.innerHTML = '<h2 style="text-align: center; color: #f7a0ff;">Erro ao carregar dados.</h2>';
+            }
+        }
+
+        // Inicia a função quando a página carregar
+        window.onload = carregarPartesEepisodios;
+    </script>
+
+    <footer>
+        <p>Projeto desenvolvido pelos alunos João Bastasini, Julia Amadio e Thiago Uliame para a disciplina de Bancos de Dados II.</p>
+    </footer>
+</body>
+</html>

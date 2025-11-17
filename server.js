@@ -68,19 +68,35 @@ app.get('/api/personagem/:nome', async (req, res) => {
     //Pega o objeto do personagem
     const personagem = resultPersonagem.rows[0];
 
-    //NOVA PARTE
     //Query 2: busca os stands associados a esse personagem
-    //Usamos 'SELECT nome' pois só precisamos do nome do stand para o link
     const queryStands = 'SELECT nome FROM Stands WHERE personagem_nome = $1';
     const resultStands = await pool.query(queryStands, [nomePersonagem]);
 
-    //Adiciona a lista de stands ao objeto do personagem
-    //resultStands.rows será uma array vazia [] se ele não tiver stands
-    //^ serve para personagens como Lisa Lisa
     personagem.stands = resultStands.rows; 
-    //FIM DA NOVA PARTE
+    
+    // [CORREÇÃO] Query 3: Busca os episódios (Sem espaços inválidos)
+    // A indentação foi refeita com espaços normais.
+    const queryEpisodios = `
+    SELECT E.numero, E.nome 
+    FROM Episodios E 
+    JOIN Personagem_Episodio PE ON E.numero = PE.episodio_numero 
+    WHERE PE.personagem_nome = $1
+    ORDER BY E.numero ASC
+`; // <-- O '`' final deve estar limpo
+    const resultEpisodios = await pool.query(queryEpisodios, [nomePersonagem]);
+    personagem.episodios = resultEpisodios.rows; // Adiciona ao objeto
 
-    //Envia o objeto 'personagem' agora combinado com seus stands
+    // [CORREÇÃO] Query 4: Busca as batalhas (Sem espaços inválidos)
+    // A indentação foi refeita com espaços normais.
+    const queryBatalhas = `
+    SELECT * FROM Batalha 
+    WHERE personagem_a = $1 OR personagem_b = $1
+    ORDER BY episodio_inicial ASC
+`; // <-- O '`' final deve estar limpo
+    const resultBatalhas = await pool.query(queryBatalhas, [nomePersonagem]);
+    personagem.batalhas = resultBatalhas.rows; // Adiciona ao objeto
+
+    //Envia o objeto 'personagem' agora combinado com stands, episodios e batalhas
     res.json(personagem);
 
   } catch (err) {
@@ -123,6 +139,41 @@ app.get('/api/stand/:nome', async (req, res) => {
 
   } catch (err) {
     console.error('Erro ao buscar detalhe do stand:', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+app.get('/api/partes-com-episodios', async (req, res) => {
+  try {
+    // Query 1: Busca todas as Partes, ordenadas por número
+    const queryPartes = 'SELECT * FROM Partes ORDER BY numero ASC';
+    const resultPartes = await pool.query(queryPartes);
+    const partes = resultPartes.rows;
+
+    // Query 2: Busca TODOS os Episódios, já ordenados
+    const queryEpisodios = 'SELECT * FROM Episodios ORDER BY parte_numero ASC, numero ASC';
+    const resultEpisodios = await pool.query(queryEpisodios);
+    const todosEpisodios = resultEpisodios.rows;
+
+    // Agora, vamos agrupar os episódios dentro de suas respectivas partes
+    const partesComEpisodios = partes.map(parte => {
+      // Filtra a lista de todos os episódios, pegando só os desta parte
+      const episodiosDaParte = todosEpisodios.filter(ep => 
+        ep.parte_numero === parte.numero
+      );
+      
+      // Retorna o objeto da parte com a lista de episódios aninhada
+      return {
+        ...parte, // Mantém os dados da parte (numero, nome, ano, etc.)
+        episodios: episodiosDaParte // Adiciona o array de episódios
+      };
+    });
+
+    // Envia o JSON agrupado
+    res.json(partesComEpisodios);
+
+  } catch (err) {
+    console.error('Erro ao buscar partes e episódios:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });

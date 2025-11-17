@@ -45,6 +45,41 @@ footer{
   position: fixed;
   bottom: 0;
   width: 100%;
+  /* [NOVO] Adiciona transição para o efeito de "slide" */
+  transition: transform 0.4s ease-in-out;
+}
+
+/* [NOVO] Classe para esconder o footer */
+footer.footer-hidden {
+  /* Move o footer 100% para baixo (para fora da tela) */
+  transform: translateY(100%);
+}
+
+/* [NOVO] Estilo do botão de fechar/abrir */
+#footer-toggle {
+  position: absolute; /* Posição relativa ao footer */
+  top: -28px; /* Puxa para cima, para fora do footer */
+  right: 1rem; /* Move para a direita (1rem = aprox. 16px da borda) */
+  transform: none; /* Remove a centralização horizontal */
+  transform: translateX(-50%); /* Ajuste fino da centralização */
+  
+  background-color: #3a0ca3; /* Mesma cor do footer */
+  color: #ffd6ff; /* Cor do texto do nav */
+  border: none;
+  border-radius: 40% 40% 0 0; /* Arredonda cantos de cima */
+  width: 50px;
+  height: 28px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 28px;
+  cursor: pointer;
+  border-top: 1px solid #7209b7; /* Destaque da borda */
+  transition: background-color 0.2s;
+  padding: 0;
+}
+
+#footer-toggle:hover {
+  background-color: #4a1bb3; /* Um pouco mais claro no hover */
 }
 
 .chart-container{
@@ -144,4 +179,124 @@ footer{
 #detalhes-stand a:hover {
     background-color: #3c1361; /*Fundo roxo escuro no hover*/
     color: #fff;               /*Texto branco no hover*/
+}
+
+/* ================================== */
+/* NOVOS ESTILOS PARA LISTAS DE DETALHES */
+/* Lhama fazendo merda
+/* ================================== */
+
+/* Título da seção (Ex: "Aparições em Episódios") */
+.section-title {
+    color: #ffd6ff;
+    text-align: center;
+    margin-top: 2rem; /* Mais espaço acima */
+    border-top: 2px solid #46096e; /* Linha roxa escura acima */
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* A lista (ul) */
+.details-list {
+    list-style: none; /* Remove as bolinhas */
+    padding: 0;
+    margin: 0;
+}
+
+/* Cada item (li) da lista */
+.details-list li {
+    background-color: #3c1361; /* Fundo roxo mais escuro */
+    color: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 8px; /* Espaço entre os itens */
+    border: 1px solid #46096e;
+    line-height: 1.4; /* Melhora a leitura se tiver duas linhas */
+}
+
+/* O texto em negrito (Ep. X:) */
+.details-list li strong {
+    color: #f7a0ff; /* Roxo claro para destacar */
+}
+
+/* O texto pequeno (Vencedor:) */
+.details-list li small {
+    color: #d0bcdd; /* Roxo mais suave e claro */
+}
+
+/* ================================== */
+/* NOVOS ESTILOS PARA LISTAS DE DETALHES */
+/* Lhama fazendo merda  dnv  */
+/* ================================== */
+
+/* [NOVO] O "card" de cada Parte */
+.parte-container {
+    background-color: #2b0b3f; /* Fundo roxo escuro (igual o de detalhes) */
+    border: 1px solid #46096e;
+    border-radius: 12px; /* Cantos mais arredondados */
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem; /* MAIS ESPAÇO entre as partes */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Sombra para destacar */
+}
+
+/* Título da Parte (ATUALIZADO) */
+.parte-titulo {
+    color: #ffd6ff; 
+    margin-top: 0; /* Remove a margem de cima, o container já tem */
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #d0bcdd;
+    padding-bottom: 10px; /* Mais espaço no padding */
+    font-size: 2rem; /* Título maior */
+    text-align: center; /* Título da parte centralizado */
+}
+
+/* [NOVO] Descrição da Parte */
+.parte-descricao {
+    color: #d0bcdd; /* Roxo mais suave para a descrição */
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-top: 1rem;
+    margin-bottom: 2rem; /* Espaço antes da lista de episódios */
+    font-style: italic;
+}
+
+/* Container para a lista de episódios (Sem mudança) */
+.episodio-lista {
+    max-width: 800px; 
+    margin: 1rem auto;
+    padding: 0;
+}
+
+/* "Card" individual de cada episódio (ATUALIZADO) */
+.episodio-item {
+    background-color: #3c1361; /* Fundo um pouco mais escuro que o .parte-container */
+    border: 1px solid #46096e;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 1rem;
+    /* [NOVO] Efeito suave ao passar o mouse */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* [NOVO] Efeito hover nos episódios */
+.episodio-item:hover {
+    transform: translateY(-3px); /* Levanta o card levemente */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Título do episódio (Sem mudança) */
+.episodio-item h3 {
+    color: #f7a0ff; 
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+/* Descrição do episódio (Sem mudança) */
+.episodio-item p {
+    color: #f8f9fa;
+    margin: 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
