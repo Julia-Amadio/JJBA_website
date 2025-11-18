@@ -31,9 +31,6 @@ logs/
 *.bak
 *.old
 
-images/
-
-
 #--------------------------DOCKER
 
 #Arquivos de build e volumes locais
