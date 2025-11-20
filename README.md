@@ -34,7 +34,7 @@ A aplicação está rodando em produção. Você pode acessá-la clicando no lin
 
 É necessário ter o [Node.js](https://nodejs.org/) (versão 16 ou superior) instalado.
 
-1.  **[to-do] Clone o repositório**
+1.  **Clone o repositório**
     <br>No terminal, navegue até a pasta onde você deseja clonar o repositório e utilize o comando:
     ```bash
     git clone https://github.com/Julia-Amadio/JJBA_website.git
